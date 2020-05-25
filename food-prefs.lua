@@ -90,12 +90,14 @@ function list_cookable()
 				if string.match(t, "EGG") then
 					--local mat_index
 					token = dfhack.matinfo.getToken(item.egg_materials.mat_type[1], item.egg_materials.mat_index[1])
+					token = string.gsub(token, "EGG_WHITE", "EGG")
 					print (token)
 				else if string.match(t, "FISH") then
 					token = "FISH:"..get_fish_by_mat_type(item.race)
 				else
 					token = dfhack.matinfo.getToken(item.mat_type, item.mat_index)
-				end 
+				end end
+				
 				if item.flags.trader then
 					accumulate(trade, token, item.stack_size)
 				else
