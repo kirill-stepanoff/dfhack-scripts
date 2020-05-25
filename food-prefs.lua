@@ -73,6 +73,7 @@ end
 
 function list_cookable()
 	cookables = {}
+	trade = {}
 	local types = {"PLANT", "PLANT_GROWTH", "DRINK", "MEAT", "CHEESE", "LIQUID_MISC", "POWDER_MISC", "SEEDS", "GLOB", "EGG", "FISH"}
 	for _, t in pairs(types) do
 		for _, item in pairs(df.global.world.items.other[t]) do
@@ -83,16 +84,23 @@ function list_cookable()
 			not item.flags.hostile and
 			not item.flags.on_fire and
 			not item.flags.rotten and
-			not item.flags.trader and
 			not item.flags.in_building and
 			not item.flags.construction then
 				local token = ""
-				if string.match(t, "FISH") then
+				if string.match(t, "EGG") then
+					--local mat_index
+					token = dfhack.matinfo.getToken(item.egg_materials.mat_type[1], item.egg_materials.mat_index[1])
+					print (token)
+				else if string.match(t, "FISH") then
 					token = "FISH:"..get_fish_by_mat_type(item.race)
 				else
 					token = dfhack.matinfo.getToken(item.mat_type, item.mat_index)
+				end 
+				if item.flags.trader then
+					accumulate(trade, token, item.stack_size)
+				else
+					accumulate(cookables, token, item.stack_size)
 				end
-				accumulate(cookables, token, item.stack_size)
 			end
 		end
 	end
@@ -129,40 +137,6 @@ function find_seeds()
 	end
 end
 
-function scan_traders()
-	trade = {}
-	local types = {"PLANT", "PLANT_GROWTH", "DRINK", "MEAT", "CHEESE", "LIQUID_MISC", "POWDER_MISC", "SEEDS", "GLOB", 
-		-- "EGG",
-		"FISH"
-		}
-	for _, t in pairs(types) do
-		for _, item in pairs(df.global.world.items.other[t]) do
-			if 
-			not item.flags.dump and
-			not item.flags.forbid and
-			not item.flags.garbage_collect and
-			not item.flags.hostile and
-			not item.flags.on_fire and
-			not item.flags.rotten and
-				item.flags.trader and
-			not item.flags.construction then
-				local token = ""
-				if string.match(t, "EGG") then
-					--local mat_index
-					token = dfhack.matinfo.getToken(item.egg_materials.mat_type[1], item.egg_materials.mat_index[1])
-					print (token)
-				else if string.match(t, "FISH") then
-					token = "FISH:"..get_fish_by_mat_type(item.race)
-				else
-					token = dfhack.matinfo.getToken(item.mat_type, item.mat_index)
-				end end
-				accumulate(trade, token, item.stack_size)
-			end
-		end
-	end
-end	
-
-
 function print_row(k)
 	print(string.format("%-40s | %9s | %9s | %9s | %9s | %9s | %9s |",k,prefs[k], ingredients[k] or '',
 		cookables[k] or '',
@@ -182,7 +156,6 @@ end
 	list_cookable()
 	find_precursors()
 	find_seeds()
-	scan_traders()
 	local tkeys = {}
 	for k in pairs(prefs) do table.insert(tkeys, k) end
 	table.sort(tkeys)
