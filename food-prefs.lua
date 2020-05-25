@@ -4,14 +4,22 @@
 
 food-prefs
 ===========
-list dwarves preferences in food and ingridients in prepared food
+list dwarves preferences in food and ingridients in prepared food, with "grep PATTERN" list only preferences that match PATTERN
 ]====]
 
 -- ---------------------------------------------------------------------------
+
+
+-- returns fish id by mat type
+-- due to mat_index in prefs is -1 
+-- dfhack.matinfo.getToken fails to retrieve token
 function get_fish_by_mat_type(mat_type)
 	return df.global.world.raws.creatures.all[mat_type].creature_id
 end
 
+
+-- creates index in table for key if there is none
+-- adds value
 function accumulate (table, key, value)
 	if table[key] == nil then
 		table[key] = value
@@ -21,6 +29,7 @@ function accumulate (table, key, value)
 end
 
 
+-- food preferences for all citizens
 function list_prefs_all_dwarves()
 	prefs = {}
 	for _,citizen in ipairs(df.global.world.units.active) do
@@ -41,6 +50,7 @@ function list_prefs_all_dwarves()
 end
 
 
+-- counts available ingredients in meals grouped by ingredient material
 function list_ingredients_in_meals()
 	ingredients = {}
 	for _, meal_stack in pairs(df.global.world.items.other.FOOD) do
@@ -54,7 +64,6 @@ function list_ingredients_in_meals()
 		not meal_stack.flags.trader and
 		not meal_stack.flags.in_building and
 		not meal_stack.flags.construction then
---			print(string.format("%-25s %4d","roast", meal_stack.stack_size))
 			for _,ingredient in pairs(meal_stack.ingredients) do
 				local token =  dfhack.matinfo.getToken(ingredient.mat_type, ingredient.mat_index)
 				if ingredient.item_type == 48 then
@@ -64,13 +73,13 @@ function list_ingredients_in_meals()
 			end
 		end
 	end
---	local tkeys = {}
---	for k in pairs(ingredients) do table.insert(tkeys, k) end
---	table.sort(tkeys)
---	for _, k in ipairs(tkeys) do print(string.format("%-40s %2d",k,ingredients[k])) end
 end
 
 
+-- count available uncooked ingredients (edible uncooked or not) on map
+-- generates two tables:
+-- 	cookables:	table for ingredients owned by fortress
+-- 	trade: 		table for ingredients owned by traders if there are any
 function list_cookable()
 	cookables = {}
 	trade = {}
@@ -88,7 +97,6 @@ function list_cookable()
 			not item.flags.construction then
 				local token = ""
 				if string.match(t, "EGG") then
-					--local mat_index
 					token = dfhack.matinfo.getToken(item.egg_materials.mat_type[1], item.egg_materials.mat_index[1])
 					token = string.gsub(token, "EGG_WHITE", "EGG")
 					print (token)
@@ -109,6 +117,7 @@ function list_cookable()
 end
 
 
+-- if item can be cooked from item owned by fortress
 function find_precursors()
 	precursors = {}
 	local precursor_table = {
@@ -129,6 +138,7 @@ function find_precursors()
 end
 
 
+-- if item can be grown from seeds owned by fortress
 function find_seeds()
 	seeds = {}
 	for tag, _ in pairs(prefs) do
@@ -139,6 +149,8 @@ function find_seeds()
 	end
 end
 
+
+-- print formatted table row
 function print_row(k)
 	print(string.format("%-40s | %9s | %9s | %9s | %9s | %9s | %9s |",k,prefs[k], ingredients[k] or '',
 		cookables[k] or '',
