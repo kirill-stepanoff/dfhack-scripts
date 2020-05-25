@@ -161,7 +161,7 @@ end
 	table.sort(tkeys)
 	local summary = {}
 
-	print(string.format("%-40s | %9s | %9s | %9s | %9s | %9s | %9s |","tag", "prefs", "in meals", "raw", "precursor", "seeds", "in tade"))
+	print(string.format("%-40s | %9s | %9s | %9s | %9s | %9s | %9s |","tag", "prefs", "in meals", "raw", "precursor", "seeds", "in trade"))
 	for _, k in ipairs(tkeys) do 
 		if cmd and cmd == "grep" then
 			if string.match(k,args[2]) then
