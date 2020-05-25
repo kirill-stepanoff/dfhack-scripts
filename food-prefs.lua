@@ -41,7 +41,7 @@ function list_prefs_all_dwarves()
 end
 
 
-function list_ingridients_in_meals()
+function list_ingredients_in_meals()
 	ingredients = {}
 	for _, meal_stack in pairs(df.global.world.items.other.FOOD) do
 		if 
@@ -154,7 +154,7 @@ end
 	local args = {...}
 	local cmd = args[1]
 	list_prefs_all_dwarves()
-	list_ingridients_in_meals()
+	list_ingredients_in_meals()
 	list_cookable()
 	find_precursors()
 	find_seeds()
