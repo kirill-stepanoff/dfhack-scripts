@@ -131,7 +131,9 @@ function find_precursors()
 		for product, precursor in pairs(precursor_table) do
 			if string.find(tag, product) then
 				local new_tag = string.gsub(tag, product, precursor)
-				precursors[tag] = cookables[new_tag]
+				if cookables[new_tag] then
+					precursors[tag] = cookables[new_tag]
+				end
 			end
 		end
 	end
@@ -152,7 +154,10 @@ end
 
 -- print formatted table row
 function print_row(k)
-	print(string.format("%-40s | %9s | %9s | %9s | %9s | %9s | %9s |",k,prefs[k], ingredients[k] or '',
+	print(string.format("%-40s | %9s | %9s | %9s | %9s | %9s | %9s |",
+		k,
+		prefs[k], 
+		ingredients[k] or '',
 		cookables[k] or '',
 		precursors[k] or '',
 		seeds[k] or '',
