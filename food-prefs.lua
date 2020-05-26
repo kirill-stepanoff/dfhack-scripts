@@ -114,9 +114,6 @@ function list_cookable()
 			end
 		end
 	end
-	for k, v in pairs(cookables) do
-		--print(string.format("%-40s | %9s", k, v))
-	end
 end
 
 
